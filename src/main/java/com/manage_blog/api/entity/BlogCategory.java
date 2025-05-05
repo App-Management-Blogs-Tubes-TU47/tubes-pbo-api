@@ -1,6 +1,5 @@
 package com.manage_blog.api.entity;
 
-import com.manage_blog.api.enums.RoleEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,31 +9,22 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "blog_category")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Users {
+public class BlogCategory {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(name= "name")
+    @Column(name = "name")
     private String name;
 
-    @Column(name= "username", unique = true)
-    private String username;
-
-    @Column(name= "email", unique = true)
-    private String email;
-
-    @Column(name= "password")
-    private String password;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name= "role")
-    private RoleEnum role;
+    @Column(name = "slugs")
+    private String slugs;
 
     @Column(name= "created_at")
     private String createdAt;
@@ -44,5 +34,4 @@ public class Users {
 
     @Column(name= "deleted_at")
     private String deletedAt;
-
 }
