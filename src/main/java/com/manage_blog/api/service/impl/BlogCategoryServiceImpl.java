@@ -46,21 +46,44 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
 
     @Override
     public BlogCategoryResponse getCategoryBySlugs(String slugs) {
-        return null;
+        BlogCategory blogCategory = blogCategoryRepository.findBlogCategoryBySlugs(slugs)
+                .orElseThrow(() -> new RuntimeException("Blog category not found"));
+
+        return new BlogCategoryResponse(blogCategory);
     }
 
     @Override
     public BlogCategoryResponse createCategory(BlogCategoryRequest blogCategoryRequest) {
-        return null;
+        BlogCategory blogCategory = new BlogCategory();
+        blogCategory.setName(blogCategoryRequest.getName());
+        blogCategory.setSlugs(createSlugService.createSlug(blogCategoryRequest.getName()));
+        blogCategory.setCreatedAt(String.valueOf(System.currentTimeMillis()));
+
+        blogCategoryRepository.save(blogCategory);
+
+        return new BlogCategoryResponse(blogCategory);
     }
 
     @Override
     public BlogCategoryResponse updateCategory(String slugs, BlogCategoryRequest blogCategoryRequest) {
-        return null;
+        BlogCategory blogCategory = blogCategoryRepository.findBlogCategoryBySlugs(slugs)
+                .orElseThrow(() -> new RuntimeException("Blog category not found"));
+
+        blogCategory.setName(blogCategoryRequest.getName());
+        blogCategory.setSlugs(createSlugService.createSlug(blogCategoryRequest.getName()));
+        blogCategory.setUpdatedAt(String.valueOf(System.currentTimeMillis()));
+
+        blogCategoryRepository.save(blogCategory);
+
+        return new BlogCategoryResponse(blogCategory);
     }
 
     @Override
     public void deleteCategory(String slugs) {
+        BlogCategory blogCategory = blogCategoryRepository.findBlogCategoryBySlugs(slugs)
+                .orElseThrow(() -> new RuntimeException("Blog category not found"));
 
+        blogCategory.setDeletedAt(String.valueOf(System.currentTimeMillis()));
+        blogCategoryRepository.save(blogCategory);
     }
 }
