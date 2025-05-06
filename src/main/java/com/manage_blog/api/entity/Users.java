@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
 import java.util.UUID;
 
@@ -15,11 +16,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Users {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-
+@Where(clause = "deleted_at IS NULL")
+public class Users extends BaseEntity {
     @Column(name= "name")
     private String name;
 
@@ -38,14 +36,4 @@ public class Users {
 
     @Column(name = "profile", length = 500, nullable = true)
     private String profile;
-
-    @Column(name= "created_at")
-    private String createdAt;
-
-    @Column(name= "updated_at")
-    private String updatedAt;
-
-    @Column(name= "deleted_at")
-    private String deletedAt;
-
 }

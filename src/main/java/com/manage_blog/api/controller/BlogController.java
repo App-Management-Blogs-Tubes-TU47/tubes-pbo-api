@@ -31,22 +31,29 @@ public class BlogController {
             @RequestParam (value = "size", required = false, defaultValue = "10") Integer size,
             @RequestParam (value = "search", required = false) String search
     ) {
-        if (page < 1){
-            page = 1;
+        try {
+            if (page < 1){
+                page = 1;
+            }
+            if (size < 1){
+                size = 10;
+            }
+            ListResponse<List<BlogResponse>> listResponse = blogService.getBlogList(
+                    page,
+                    size,
+                    search
+            );
+            return WebResponse.<ListResponse<List<BlogResponse>>>builder()
+                    .status(200)
+                    .message("Success")
+                    .data(listResponse)
+                    .build();
+        } catch (Exception e) {
+            return WebResponse.<ListResponse<List<BlogResponse>>>builder()
+                    .status(500)
+                    .error(e.getMessage())
+                    .build();
         }
-        if (size < 1){
-            size = 10;
-        }
-        ListResponse<List<BlogResponse>> listResponse = blogService.getBlogList(
-                page,
-                size,
-                search
-        );
-        return WebResponse.<ListResponse<List<BlogResponse>>>builder()
-                .status(200)
-                .message("Success")
-                .data(listResponse)
-                .build();
     }
 
 //    =========================
@@ -57,12 +64,19 @@ public class BlogController {
     public WebResponse<BlogResponse> getBlogBySlugs(
             @PathVariable("slugs") String slugs
     ) {
-        BlogResponse blogResponse = blogService.getBlogBySlugs(slugs);
-        return WebResponse.<BlogResponse>builder()
-                .status(200)
-                .message("Success")
-                .data(blogResponse)
-                .build();
+        try {
+            BlogResponse blogResponse = blogService.getBlogBySlugs(slugs);
+            return WebResponse.<BlogResponse>builder()
+                    .status(200)
+                    .message("Success")
+                    .data(blogResponse)
+                    .build();
+        } catch (Exception e) {
+            return WebResponse.<BlogResponse>builder()
+                    .status(500)
+                    .error(e.getMessage())
+                    .build();
+        }
     }
 
 //    =========================
@@ -109,12 +123,19 @@ public class BlogController {
      public WebResponse<String> deleteBlog(
              @PathVariable("slugs") String slugs
      ) {
-         blogService.deleteBlog(slugs);
-         return WebResponse.<String>builder()
-                 .status(200)
-                 .message("Success")
-                 .data("Blog deleted successfully")
-                 .build();
+        try {
+            blogService.deleteBlog(slugs);
+            return WebResponse.<String>builder()
+                    .status(200)
+                    .message("Success")
+                    .data("Blog deleted successfully")
+                    .build();
+        } catch (Exception e) {
+            return WebResponse.<String>builder()
+                    .status(500)
+                    .error(e.getMessage())
+                    .build();
+        }
      }
 
 

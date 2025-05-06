@@ -1,6 +1,5 @@
 package com.manage_blog.api.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,10 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class ListResponse<T> {
-
-    private T item;
-    private PaginationResponse pagination;
-
+public class CommentRequest {
+    private String comment;
+    private String blogSlug;
+    private String username;
 }

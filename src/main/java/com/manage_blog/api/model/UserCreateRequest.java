@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
@@ -16,4 +17,5 @@ public class UserCreateRequest {
     private String email;
     private String password;
     private RoleEnum role;
+    private MultipartFile profile;
 }

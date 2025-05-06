@@ -5,6 +5,7 @@ import com.manage_blog.api.model.BlogCategoryResponse;
 import com.manage_blog.api.model.ListResponse;
 import com.manage_blog.api.model.WebResponse;
 import com.manage_blog.api.service.BlogCategoryService;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,22 +30,29 @@ public class BlogCategoryController {
             @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
             @RequestParam(value = "search", required = false) String search
     ) {
-        if (page < 1) {
-            page = 1;
+        try {
+            if (page < 1) {
+                page = 1;
+            }
+            if (size < 1) {
+                size = 10;
+            }
+            ListResponse<List<BlogCategoryResponse>> listResponse = blogCategoryService.getCategoryList(
+                    page,
+                    size,
+                    search
+            );
+            return WebResponse.<ListResponse<List<BlogCategoryResponse>>>builder()
+                    .status(200)
+                    .message("Success")
+                    .data(listResponse)
+                    .build();
+        } catch (Exception e) {
+            return WebResponse.<ListResponse<List<BlogCategoryResponse>>>builder()
+                    .status(500)
+                    .error(e.getMessage())
+                    .build();
         }
-        if (size < 1) {
-            size = 10;
-        }
-        ListResponse<List<BlogCategoryResponse>> listResponse = blogCategoryService.getCategoryList(
-                page,
-                size,
-                search
-        );
-        return WebResponse.<ListResponse<List<BlogCategoryResponse>>>builder()
-                .status(200)
-                .message("Success")
-                .data(listResponse)
-                .build();
     }
 
     // ==========================
@@ -55,12 +63,19 @@ public class BlogCategoryController {
     public WebResponse<BlogCategoryResponse> getBlogCategoryBySlugs(
             @RequestParam("slugs") String slugs
     ) {
-        BlogCategoryResponse blogCategoryResponse = blogCategoryService.getCategoryBySlugs(slugs);
-        return WebResponse.<BlogCategoryResponse>builder()
-                .status(200)
-                .message("Success")
-                .data(blogCategoryResponse)
-                .build();
+        try {
+            BlogCategoryResponse blogCategoryResponse = blogCategoryService.getCategoryBySlugs(slugs);
+            return WebResponse.<BlogCategoryResponse>builder()
+                    .status(200)
+                    .message("Success")
+                    .data(blogCategoryResponse)
+                    .build();
+        } catch (Exception e) {
+            return WebResponse.<BlogCategoryResponse>builder()
+                    .status(500)
+                    .error(e.getMessage())
+                    .build();
+        }
     }
 
     // ==========================
@@ -71,12 +86,19 @@ public class BlogCategoryController {
     public WebResponse<BlogCategoryResponse> createBlogCategory(
             @RequestBody BlogCategoryRequest blogCategoryRequest
     ) {
-        BlogCategoryResponse blogCategoryResponse = blogCategoryService.createCategory(blogCategoryRequest);
-        return WebResponse.<BlogCategoryResponse>builder()
-                .status(201)
-                .message("Success")
-                .data(blogCategoryResponse)
-                .build();
+        try {
+            BlogCategoryResponse blogCategoryResponse = blogCategoryService.createCategory(blogCategoryRequest);
+            return WebResponse.<BlogCategoryResponse>builder()
+                    .status(201)
+                    .message("Success")
+                    .data(blogCategoryResponse)
+                    .build();
+        } catch (Exception e) {
+            return WebResponse.<BlogCategoryResponse>builder()
+                    .status(500)
+                    .error(e.getMessage())
+                    .build();
+        }
     }
 
 
@@ -90,12 +112,19 @@ public class BlogCategoryController {
             @PathVariable("slugs") String slugs,
             @RequestBody BlogCategoryRequest blogCategoryRequest
     ) {
-        BlogCategoryResponse blogCategoryResponse = blogCategoryService.updateCategory(slugs, blogCategoryRequest);
-        return WebResponse.<BlogCategoryResponse>builder()
-                .status(200)
-                .message("Success")
-                .data(blogCategoryResponse)
-                .build();
+        try {
+            BlogCategoryResponse blogCategoryResponse = blogCategoryService.updateCategory(slugs, blogCategoryRequest);
+            return WebResponse.<BlogCategoryResponse>builder()
+                    .status(200)
+                    .message("Success")
+                    .data(blogCategoryResponse)
+                    .build();
+        } catch (Exception e) {
+            return WebResponse.<BlogCategoryResponse>builder()
+                    .status(500)
+                    .error(e.getMessage())
+                    .build();
+        }
     }
 
     // ==========================
@@ -106,12 +135,20 @@ public class BlogCategoryController {
     public WebResponse<String> deleteBlogCategory(
             @PathVariable("slugs") String slugs
     ) {
-        blogCategoryService.deleteCategory(slugs);
-        return WebResponse.<String>builder()
-                .status(200)
-                .message("Success")
-                .data("Blog category with slugs " + slugs + " deleted successfully")
-                .build();
+        try{
+
+            blogCategoryService.deleteCategory(slugs);
+            return WebResponse.<String>builder()
+                    .status(200)
+                    .message("Success")
+                    .data("Blog category with slugs " + slugs + " deleted successfully")
+                    .build();
+        } catch (Exception e) {
+            return WebResponse.<String>builder()
+                    .status(500)
+                    .error(e.getMessage())
+                    .build();
+        }
     }
 
 

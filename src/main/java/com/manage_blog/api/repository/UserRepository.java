@@ -13,8 +13,7 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<Users, String>, JpaSpecificationExecutor<Users> {
 
-    @Query("SELECT u FROM Users u WHERE " +
-            "u.deletedAt IS NULL AND (" +
+    @Query("SELECT u FROM Users u WHERE (" +
             ":search IS NULL OR :search = '' OR " +
             "LOWER(u.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
             "LOWER(u.username) LIKE LOWER(CONCAT('%', :search, '%')) OR " +

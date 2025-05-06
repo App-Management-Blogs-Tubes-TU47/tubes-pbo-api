@@ -6,21 +6,18 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
 import java.util.UUID;
 
 @Entity
 @Table(name = "blogs")
-@Data
+@Data()
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Blog {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-
+@Where(clause = "deleted_at IS NULL")
+public class Blog extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private BlogCategory category;
@@ -44,13 +41,4 @@ public class Blog {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private StatusEnum status;
-
-    @Column(name= "created_at")
-    private String createdAt;
-
-    @Column(name= "updated_at")
-    private String updatedAt;
-
-    @Column(name= "deleted_at")
-    private String deletedAt;
 }

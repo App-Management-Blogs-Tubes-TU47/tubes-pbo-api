@@ -10,16 +10,21 @@ import org.hibernate.annotations.Where;
 import java.util.UUID;
 
 @Entity
-@Table(name = "blog_category")
+@Table(name = "comment")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Where(clause = "deleted_at IS NULL")
-public class BlogCategory extends BaseEntity {
-    @Column(name = "name")
-    private String name;
+public class Comment extends BaseEntity {
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private Users user;
 
-    @Column(name = "slugs")
-    private String slugs;
+    @ManyToOne
+    @JoinColumn(name = "blog_id", referencedColumnName = "id")
+    private Blog blog;
+
+    @Column(name = "comment")
+    private String comment;
 }

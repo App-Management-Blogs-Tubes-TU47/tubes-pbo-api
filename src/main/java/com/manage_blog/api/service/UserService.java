@@ -5,6 +5,7 @@ import com.manage_blog.api.model.UserCreateRequest;
 import com.manage_blog.api.model.UserResponse;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -18,7 +19,7 @@ public interface UserService {
 
     UserResponse getUserByUsername(String username);
 
-    UserResponse createUser(UserCreateRequest userCreateRequest);
+    UserResponse createUser(UserCreateRequest userCreateRequest) throws IOException;
 
     UserResponse updateUser(String username, UserCreateRequest userCreateRequest);
 

@@ -20,7 +20,7 @@ public class ErrorController {
         return ResponseEntity.status(status)
                 .body(WebResponse.<String>builder()
                         .status(status.value()) // Set status di body
-                        .errors(exception.getReason())
+                        .error(exception.getReason())
                         .build());
     }
 
@@ -29,7 +29,7 @@ public class ErrorController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(WebResponse.<String>builder()
                         .status(HttpStatus.BAD_REQUEST.value()) // Set status di body
-                        .errors(exception.getMessage())
+                        .error(exception.getMessage())
                         .build());
     }
 }

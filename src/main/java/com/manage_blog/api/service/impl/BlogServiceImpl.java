@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -23,7 +24,7 @@ import java.util.List;
 public class BlogServiceImpl implements BlogService {
 
     @Autowired
-    private BlogRepository BlogRepository;
+    private BlogRepository blogRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -37,49 +38,62 @@ public class BlogServiceImpl implements BlogService {
     @Autowired
     private StorageService storageService;
 
+    @Override
     @Transactional
     public ListResponse<List<BlogResponse>> getBlogList(int page, int size, String search) {
 
         PageRequest pageRequest = PageRequest.of(page - 1, size);
-        Page<Blog> blogPage= BlogRepository.findBySearch(search, pageRequest);
+        Page<Blog> blogPage = blogRepository.findBySearch(search, pageRequest);
 
         List<BlogResponse> blogResponse = blogPage.getContent().stream()
                 .map(blog -> {
                     BlogResponse response = new BlogResponse(blog);
                     if (blog.getTumbnail() != null) response.setTumbnailUrl(storageService.getFileUrl(blog.getTumbnail()));
-                    response.setAuthor(new UserResponse(blog.getUser()));
-                    response.setCategory(new BlogCategoryResponse(blog.getCategory()));
+                    response.setAuthorName(blog.getUser().getName());
+                    response.setAuthorUsername(blog.getUser().getUsername());
+                    response.setCategoryName(blog.getCategory().getName());
+                    response.setCategorySlugs(blog.getCategory().getSlugs());
                     return response;
                 })
                 .toList();
 
-        PaginationResponse paginationResponse = new PaginationResponse();
-        paginationResponse.setPage(page);
-        paginationResponse.setSize(size);
-        paginationResponse.setTotalRecords((int) blogPage.getTotalElements());
-        paginationResponse.setTotalPages(blogPage.getTotalPages());
+        PaginationResponse paginationResponse = PaginationResponse.builder()
+                .page(page)
+                .size(size)
+                .totalRecords((int) blogPage.getTotalElements())
+                .totalPages(blogPage.getTotalPages())
+                .build();
 
         return new ListResponse<>(blogResponse, paginationResponse);
     }
 
+    @Override
     @Transactional
     public BlogResponse getBlogBySlugs(String slugs) {
-        Blog blog = BlogRepository.findBlogBySlugs(slugs)
+        Blog blog = blogRepository.findBlogBySlugs(slugs)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Blog not found"));
 
         BlogResponse response = new BlogResponse(blog);
         if (blog.getTumbnail() != null) response.setTumbnailUrl(storageService.getFileUrl(blog.getTumbnail()));
-        response.setAuthor(new UserResponse(blog.getUser()));
+
+        Users user = blog.getUser();
+        UserResponse userResponse = new UserResponse(user);
+        if (user.getProfile() != null) {
+            userResponse.setProfileUrl(storageService.getFileUrl(user.getProfile()));
+        }
+        response.setAuthor(userResponse);
         response.setCategory(new BlogCategoryResponse(blog.getCategory()));
 
         return response;
     }
 
+    @Override
     @Transactional
     public BlogResponse createBlog(BlogRequest blogRequest) throws IOException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
         LocalDate currentDate = LocalDate.now();
         String formattedDate = currentDate.format(formatter);
+
         Users user = userRepository.findByUsername(blogRequest.getAuthor())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
@@ -103,25 +117,31 @@ public class BlogServiceImpl implements BlogService {
                 .status(blogRequest.getStatus())
                 .user(user)
                 .category(blogCategory)
-                .createdAt(String.valueOf(System.currentTimeMillis()))
                 .build();
 
-        Blog savedBlog = BlogRepository.save(blog);
-
+        Blog savedBlog = blogRepository.save(blog);
 
         BlogResponse response = new BlogResponse(savedBlog);
         if (savedBlog.getTumbnail() != null) response.setTumbnailUrl(storageService.getFileUrl(savedBlog.getTumbnail()));
 
+        UserResponse userResponse = new UserResponse(user);
+        if (user.getProfile() != null) {
+            userResponse.setProfileUrl(storageService.getFileUrl(user.getProfile()));
+        }
+        response.setAuthor(userResponse);
+        response.setCategory(new BlogCategoryResponse(savedBlog.getCategory()));
+
         return response;
     }
 
+    @Override
     @Transactional
     public BlogResponse updateBlog(String slugs, BlogRequest blogRequest) throws IOException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
         LocalDate currentDate = LocalDate.now();
         String formattedDate = currentDate.format(formatter);
 
-        Blog blog = BlogRepository.findBlogBySlugs(slugs)
+        Blog blog = blogRepository.findBlogBySlugs(slugs)
                 .orElseThrow(() -> new RuntimeException("Blog not found"));
 
         NullAwareBeanUtils.copyNonNullProperties(blogRequest, blog);
@@ -149,20 +169,32 @@ public class BlogServiceImpl implements BlogService {
             blog.setTumbnail(tumbnailName);
         }
 
-        BlogRepository.save(blog);
+        blogRepository.save(blog);
 
         BlogResponse response = new BlogResponse(blog);
         if (blog.getTumbnail() != null) response.setTumbnailUrl(storageService.getFileUrl(blog.getTumbnail()));
 
+        Users user = blog.getUser();
+        UserResponse userResponse = new UserResponse(user);
+        if (user.getProfile() != null) {
+            userResponse.setProfileUrl(storageService.getFileUrl(user.getProfile()));
+        }
+        response.setAuthor(userResponse);
+        response.setCategory(new BlogCategoryResponse(blog.getCategory()));
+
         return response;
     }
 
+    @Override
     @Transactional
     public void deleteBlog(String slugs) {
-        Blog blog = BlogRepository.findBlogBySlugs(slugs)
+        Blog blog = blogRepository.findBlogBySlugs(slugs)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Blog not found"));
 
-        blog.setDeletedAt(String.valueOf(System.currentTimeMillis()));
-        BlogRepository.save(blog);
+        if (blog.getTumbnail() != null) {
+            storageService.deleteFile(blog.getTumbnail());
+        }
+        blog.setDeletedAt(LocalDateTime.now());
+        blogRepository.save(blog);
     }
 }

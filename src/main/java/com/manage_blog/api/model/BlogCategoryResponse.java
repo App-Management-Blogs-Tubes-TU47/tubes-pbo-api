@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -16,8 +17,8 @@ public class BlogCategoryResponse {
     private UUID id;
     private String name;
     private String slugs;
-    private String createdAt;
-    private String updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public BlogCategoryResponse(BlogCategory blogCategory) {
         this.id = blogCategory.getId();

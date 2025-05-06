@@ -31,22 +31,29 @@ public class UserController {
             @RequestParam (value = "size", required = false, defaultValue = "10") Integer size,
             @RequestParam (value = "search", required = false) String search
     ) {
-        if (page < 1){
-            page = 1;
+        try {
+            if (page < 1){
+                page = 1;
+            }
+            if (size < 1){
+                size = 10;
+            }
+            ListResponse<List<UserResponse>> listResponse = userService.getUser(
+                    page,
+                    size,
+                    search
+            );
+            return WebResponse.<ListResponse<List<UserResponse>>>builder()
+                    .status(200)
+                    .message("Success")
+                    .data(listResponse)
+                    .build();
+        } catch (Exception e) {
+            return WebResponse.<ListResponse<List<UserResponse>>>builder()
+                    .status(500)
+                    .error(e.getMessage())
+                    .build();
         }
-        if (size < 1){
-            size = 10;
-        }
-        ListResponse<List<UserResponse>> listResponse = userService.getUser(
-                page,
-                size,
-                search
-        );
-        return WebResponse.<ListResponse<List<UserResponse>>>builder()
-                .status(200)
-                .message("Success")
-                .data(listResponse)
-                .build();
     }
 
 //    =========================
@@ -57,12 +64,19 @@ public class UserController {
     public WebResponse<UserResponse> getUserByUsername(
             @PathVariable("username") String username
     ) {
-        UserResponse userResponse = userService.getUserByUsername(username);
-        return WebResponse.<UserResponse>builder()
-                .status(200)
-                .message("Success")
-                .data(userResponse)
-                .build();
+        try {
+            UserResponse userResponse = userService.getUserByUsername(username);
+            return WebResponse.<UserResponse>builder()
+                    .status(200)
+                    .message("Success")
+                    .data(userResponse)
+                    .build();
+        } catch (Exception e) {
+            return WebResponse.<UserResponse>builder()
+                    .status(500)
+                    .error(e.getMessage())
+                    .build();
+        }
     }
 
 //    =========================
@@ -70,18 +84,24 @@ public class UserController {
 //    @Body name, username, email, password, role
 //    =========================
     @PostMapping(
-            produces = MediaType.APPLICATION_JSON_VALUE
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public WebResponse<UserResponse> createUser(
-            @RequestBody UserCreateRequest user
+            @ModelAttribute UserCreateRequest user
     ) {
-        UserResponse userResponse = userService.createUser(user);
-
-        return WebResponse.<UserResponse>builder()
-                .status(200)
-                .message("Success")
-                .data(userResponse)
-                .build();
+        try {
+            UserResponse userResponse = userService.createUser(user);
+            return WebResponse.<UserResponse>builder()
+                    .status(200)
+                    .message("Success")
+                    .data(userResponse)
+                    .build();
+        } catch (Exception e) {
+            return WebResponse.<UserResponse>builder()
+                    .status(500)
+                    .error(e.getMessage())
+                    .build();
+        }
     }
 
 //    =========================
@@ -89,17 +109,24 @@ public class UserController {
 //    @Params id
 //    @Body name, username, email, password, role
 //    =========================
-    @PatchMapping("/{username}")
+    @PatchMapping(value = "/{username}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public WebResponse<UserResponse> updateUser(
             @PathVariable("username") String username,
-            @RequestBody UserCreateRequest userCreateRequest
+            @ModelAttribute UserCreateRequest userCreateRequest
     ) {
-        UserResponse userResponse = userService.updateUser(username, userCreateRequest);
-        return WebResponse.<UserResponse>builder()
-                .status(200)
-                .message("Success")
-                .data(userResponse)
-                .build();
+        try {
+            UserResponse userResponse = userService.updateUser(username, userCreateRequest);
+            return WebResponse.<UserResponse>builder()
+                    .status(200)
+                    .message("Success")
+                    .data(userResponse)
+                    .build();
+        } catch (Exception e) {
+            return WebResponse.<UserResponse>builder()
+                    .status(500)
+                    .error(e.getMessage())
+                    .build();
+        }
     }
 
 //    =========================
@@ -110,12 +137,19 @@ public class UserController {
     public WebResponse<String> deleteUser(
             @PathVariable("username") String username
     ) {
-        userService.deleteUser(username);
-        return WebResponse.<String>builder()
-                .status(200)
-                .message("Success")
-                .data("User with username " + username + " has been deleted")
-                .build();
+        try {
+            userService.deleteUser(username);
+            return WebResponse.<String>builder()
+                    .status(200)
+                    .message("Success")
+                    .data("User with username " + username + " has been deleted")
+                    .build();
+        } catch (Exception e) {
+            return WebResponse.<String>builder()
+                    .status(500)
+                    .error(e.getMessage())
+                    .build();
+        }
     }
 
 }

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -38,11 +39,12 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
                 .toList();
 
         // Prepare pagination response
-        PaginationResponse paginationResponse = new PaginationResponse();
-        paginationResponse.setPage(page);
-        paginationResponse.setSize(size);
-        paginationResponse.setTotalRecords((int) categoryPage.getTotalElements());
-        paginationResponse.setTotalPages(categoryPage.getTotalPages());
+        PaginationResponse paginationResponse = PaginationResponse.builder()
+                .page(page)
+                .size(size)
+                .totalRecords((int) categoryPage.getTotalElements())
+                .totalPages(categoryPage.getTotalPages())
+                .build();
 
         return new ListResponse<>(categoryResponse, paginationResponse);
     }
@@ -60,7 +62,6 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
         BlogCategory blogCategory = new BlogCategory();
         blogCategory.setName(blogCategoryRequest.getName());
         blogCategory.setSlugs(createSlugService.createSlug(blogCategoryRequest.getName()));
-        blogCategory.setCreatedAt(String.valueOf(System.currentTimeMillis()));
 
         blogCategoryRepository.save(blogCategory);
 
@@ -74,7 +75,6 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
 
         NullAwareBeanUtils.copyNonNullProperties(blogCategory, blogCategory);
         blogCategory.setSlugs(createSlugService.createSlug(blogCategoryRequest.getName()));
-        blogCategory.setUpdatedAt(String.valueOf(System.currentTimeMillis()));
 
         blogCategoryRepository.save(blogCategory);
 
@@ -86,7 +86,8 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
         BlogCategory blogCategory = blogCategoryRepository.findBlogCategoryBySlugs(slugs)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Blog category not found"));
 
-        blogCategory.setDeletedAt(String.valueOf(System.currentTimeMillis()));
+
+        blogCategory.setDeletedAt(LocalDateTime.now());
         blogCategoryRepository.save(blogCategory);
     }
 }
