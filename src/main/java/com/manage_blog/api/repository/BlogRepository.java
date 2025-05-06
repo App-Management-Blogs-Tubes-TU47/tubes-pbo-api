@@ -16,11 +16,12 @@ public interface BlogRepository extends JpaRepository<Blog, String>, JpaSpecific
     @Query("SELECT u FROM Blog u WHERE " +
             "u.deletedAt IS NULL AND (" +
             ":search IS NULL OR :search = '' OR " +
-            "LOWER(u.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(u.title) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
             "LOWER(u.slugs) LIKE LOWER(CONCAT('%', :search, '%')) )")
     Page<Blog> findBySearch(@Param("search") String search, PageRequest pageRequest);
 
-    @Query("SELECT b FROM Blog b WHERE b.slugs = :slugs")
+    @Query("SELECT b FROM Blog b WHERE b.slugs = :slugs"
+    + " AND b.deletedAt IS NULL")
     Optional<Blog> findBlogBySlugs(@Param("slugs") String slugs);
 
 }

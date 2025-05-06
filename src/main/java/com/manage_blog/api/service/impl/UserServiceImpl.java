@@ -13,9 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -49,7 +51,7 @@ public class UserServiceImpl implements UserService {
         Page<Users> userPage = userRepository.findBySearch(search, pageRequest);
 
         List<UserResponse> userResponses = userPage.getContent().stream()
-                .map(user -> new UserResponse(user))
+                .map(UserResponse::new)
                 .toList();
 
         // Prepare pagination response
@@ -71,7 +73,7 @@ public class UserServiceImpl implements UserService {
             String username
     ) {
         Users user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         return new UserResponse(user);
     }
 
@@ -115,7 +117,7 @@ public class UserServiceImpl implements UserService {
             UserCreateRequest u
     ) {
         Users user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found"));
 
         // Update user details
         NullAwareBeanUtils.copyNonNullProperties(u, user);
@@ -143,7 +145,7 @@ public class UserServiceImpl implements UserService {
             String username
     ) {
         Users user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         user.setDeletedAt(String.valueOf(System.currentTimeMillis()));
         userRepository.save(user);
 

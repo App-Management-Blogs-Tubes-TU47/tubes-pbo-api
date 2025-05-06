@@ -18,6 +18,7 @@ public class UserResponse {
     private String username;
     private String email;
     private RoleEnum role;
+    private String profileUrl;
     private String createdAt;
     private String updatedAt;
 

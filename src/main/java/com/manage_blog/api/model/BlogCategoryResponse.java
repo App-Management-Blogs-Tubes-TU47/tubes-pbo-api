@@ -13,18 +13,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class BlogCategoryResponse {
-
     private UUID id;
     private String name;
     private String slugs;
     private String createdAt;
     private String updatedAt;
 
-    public BlogCategoryResponse(BlogCategory category) {
-        this.id = category.getId();
-        this.name = category.getName();
-        this.slugs = category.getSlugs();
-        this.createdAt = category.getCreatedAt();
-        this.updatedAt = category.getUpdatedAt();
+    public BlogCategoryResponse(BlogCategory blogCategory) {
+
     }
 }

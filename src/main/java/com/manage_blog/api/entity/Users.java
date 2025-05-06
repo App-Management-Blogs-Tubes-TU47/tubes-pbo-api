@@ -36,6 +36,9 @@ public class Users {
     @Column(name= "role")
     private RoleEnum role;
 
+    @Column(name = "profile", length = 500, nullable = true)
+    private String profile;
+
     @Column(name= "created_at")
     private String createdAt;
 

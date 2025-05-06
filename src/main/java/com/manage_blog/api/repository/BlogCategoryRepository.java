@@ -13,14 +13,15 @@ import java.util.Optional;
 
 public interface BlogCategoryRepository extends JpaRepository<BlogCategory, String>, JpaSpecificationExecutor<BlogCategory> {
 
-    @Query("SELECT u FROM BlogCategory u WHERE " +
-            "u.deletedAt IS NULL AND (" +
+    @Query("SELECT c FROM BlogCategory c WHERE " +
+            "c.deletedAt IS NULL AND (" +
             ":search IS NULL OR :search = '' OR " +
-            "LOWER(u.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-            "LOWER(u.slugs) LIKE LOWER(CONCAT('%', :search, '%')) )")
+            "LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(c.slugs) LIKE LOWER(CONCAT('%', :search, '%')) )")
     Page<BlogCategory> findBySearch(@Param("search") String search, PageRequest pageRequest);
 
-    @Query("SELECT b FROM BlogCategory b WHERE b.slugs = :slugs")
+    @Query("SELECT b FROM BlogCategory b WHERE b.slugs = :slugs"
+    + " AND b.deletedAt IS NULL")
     Optional<BlogCategory> findBlogCategoryBySlugs(@Param("slugs") String slugs);
 
 }

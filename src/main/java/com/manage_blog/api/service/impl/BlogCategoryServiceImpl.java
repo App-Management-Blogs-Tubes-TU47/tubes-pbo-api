@@ -1,16 +1,19 @@
 package com.manage_blog.api.service.impl;
 
 import com.manage_blog.api.entity.BlogCategory;
-import com.manage_blog.api.entity.Users;
 import com.manage_blog.api.model.*;
 import com.manage_blog.api.repository.BlogCategoryRepository;
 import com.manage_blog.api.service.BlogCategoryService;
 import com.manage_blog.api.service.CreateSlugService;
+import com.manage_blog.api.utils.NullAwareBeanUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -24,14 +27,14 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
     @Autowired
     private CreateSlugService createSlugService;
 
-    @Override
+    @Transactional
     public ListResponse<List<BlogCategoryResponse>> getCategoryList(int page, int size, String search) {
 
         PageRequest pageRequest = PageRequest.of(page - 1, size);
         Page<BlogCategory> categoryPage= blogCategoryRepository.findBySearch(search, pageRequest);
 
         List<BlogCategoryResponse> categoryResponse = categoryPage.getContent().stream()
-                .map(category -> new BlogCategoryResponse(category))
+                .map(BlogCategoryResponse::new)
                 .toList();
 
         // Prepare pagination response
@@ -44,15 +47,15 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
         return new ListResponse<>(categoryResponse, paginationResponse);
     }
 
-    @Override
+    @Transactional
     public BlogCategoryResponse getCategoryBySlugs(String slugs) {
         BlogCategory blogCategory = blogCategoryRepository.findBlogCategoryBySlugs(slugs)
-                .orElseThrow(() -> new RuntimeException("Blog category not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Blog category not found"));
 
         return new BlogCategoryResponse(blogCategory);
     }
 
-    @Override
+    @Transactional
     public BlogCategoryResponse createCategory(BlogCategoryRequest blogCategoryRequest) {
         BlogCategory blogCategory = new BlogCategory();
         blogCategory.setName(blogCategoryRequest.getName());
@@ -64,12 +67,12 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
         return new BlogCategoryResponse(blogCategory);
     }
 
-    @Override
+    @Transactional
     public BlogCategoryResponse updateCategory(String slugs, BlogCategoryRequest blogCategoryRequest) {
         BlogCategory blogCategory = blogCategoryRepository.findBlogCategoryBySlugs(slugs)
-                .orElseThrow(() -> new RuntimeException("Blog category not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Blog category not found"));
 
-        blogCategory.setName(blogCategoryRequest.getName());
+        NullAwareBeanUtils.copyNonNullProperties(blogCategory, blogCategory);
         blogCategory.setSlugs(createSlugService.createSlug(blogCategoryRequest.getName()));
         blogCategory.setUpdatedAt(String.valueOf(System.currentTimeMillis()));
 
@@ -78,10 +81,10 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
         return new BlogCategoryResponse(blogCategory);
     }
 
-    @Override
+    @Transactional
     public void deleteCategory(String slugs) {
         BlogCategory blogCategory = blogCategoryRepository.findBlogCategoryBySlugs(slugs)
-                .orElseThrow(() -> new RuntimeException("Blog category not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Blog category not found"));
 
         blogCategory.setDeletedAt(String.valueOf(System.currentTimeMillis()));
         blogCategoryRepository.save(blogCategory);

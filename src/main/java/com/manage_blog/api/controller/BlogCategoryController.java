@@ -103,13 +103,14 @@ public class BlogCategoryController {
     // @Params slugs
     // ==========================
     @DeleteMapping("/{slugs}")
-    public WebResponse<Void> deleteBlogCategory(
+    public WebResponse<String> deleteBlogCategory(
             @PathVariable("slugs") String slugs
     ) {
         blogCategoryService.deleteCategory(slugs);
-        return WebResponse.<Void>builder()
+        return WebResponse.<String>builder()
                 .status(200)
                 .message("Success")
+                .data("Blog category with slugs " + slugs + " deleted successfully")
                 .build();
     }
 

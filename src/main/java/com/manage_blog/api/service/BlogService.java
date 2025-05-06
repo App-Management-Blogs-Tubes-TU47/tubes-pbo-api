@@ -5,6 +5,7 @@ import com.manage_blog.api.model.BlogResponse;
 import com.manage_blog.api.model.ListResponse;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -15,9 +16,9 @@ public interface BlogService {
 
     BlogResponse getBlogBySlugs(String slugs);
 
-    BlogResponse createBlog(BlogRequest BlogRequest);
+    BlogResponse createBlog(BlogRequest BlogRequest) throws IOException;
 
-    BlogResponse updateBlog(String slugs, BlogRequest BlogRequest);
+    BlogResponse updateBlog(String slugs, BlogRequest BlogRequest) throws IOException;
 
     void deleteBlog(String slugs);
 

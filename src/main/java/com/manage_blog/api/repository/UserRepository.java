@@ -21,7 +21,8 @@ public interface UserRepository extends JpaRepository<Users, String>, JpaSpecifi
             "LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) )")
     Page<Users> findBySearch(@Param("search") String search, PageRequest pageRequest);
 
-    @Query("SELECT u FROM Users u WHERE u.username = :username")
+    @Query("SELECT u FROM Users u WHERE u.username = :username"
+    + " AND u.deletedAt IS NULL")
     Optional<Users> findByUsername(@Param("username") String username);
 
 }

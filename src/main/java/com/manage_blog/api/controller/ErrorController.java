@@ -14,16 +14,22 @@ import org.springframework.web.server.ResponseStatusException;
 @RestControllerAdvice
 public class ErrorController {
 
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<WebResponse<String>> apiException(ResponseStatusException exception) {
+        HttpStatus status = (HttpStatus) exception.getStatusCode();
+        return ResponseEntity.status(status)
+                .body(WebResponse.<String>builder()
+                        .status(status.value()) // Set status di body
+                        .errors(exception.getReason())
+                        .build());
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<WebResponse<String>> constraintViolationException(ConstraintViolationException exception) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(WebResponse.<String>builder().errors(exception.getMessage()).build());
+                .body(WebResponse.<String>builder()
+                        .status(HttpStatus.BAD_REQUEST.value()) // Set status di body
+                        .errors(exception.getMessage())
+                        .build());
     }
-
-    @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<WebResponse<String>> apiException(ResponseStatusException exception) {
-        return ResponseEntity.status(exception.getStatusCode())
-                .body(WebResponse.<String>builder().errors(exception.getReason()).build());
-    }
-
 }
