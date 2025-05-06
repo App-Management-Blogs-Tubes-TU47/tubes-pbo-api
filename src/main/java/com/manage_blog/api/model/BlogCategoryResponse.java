@@ -20,6 +20,10 @@ public class BlogCategoryResponse {
     private String updatedAt;
 
     public BlogCategoryResponse(BlogCategory blogCategory) {
-
+        this.id = blogCategory.getId();
+        this.name = blogCategory.getName();
+        this.slugs = blogCategory.getSlugs();
+        this.createdAt = blogCategory.getCreatedAt();
+        this.updatedAt = blogCategory.getUpdatedAt();
     }
 }

@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Nullable;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,7 +17,10 @@ public class BlogRequest {
     private String title;
     private String category;
     private String author;
-    private MultipartFile tumbnail;
+
+    @Nullable
+    private MultipartFile thumbnailFile;
+
     private String article;
     private StatusEnum status;
 }

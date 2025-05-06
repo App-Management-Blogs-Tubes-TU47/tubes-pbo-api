@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,6 +20,8 @@ public class BlogResponse {
     private String article;
     private StatusEnum status;
     private String tumbnailUrl;
+    private UserResponse author;
+    private BlogCategoryResponse category;
     private String createdAt;
     private String updatedAt;
 

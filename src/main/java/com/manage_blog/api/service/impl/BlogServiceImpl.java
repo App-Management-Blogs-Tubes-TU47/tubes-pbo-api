@@ -46,7 +46,9 @@ public class BlogServiceImpl implements BlogService {
         List<BlogResponse> blogResponse = blogPage.getContent().stream()
                 .map(blog -> {
                     BlogResponse response = new BlogResponse(blog);
-                    response.setTumbnailUrl(storageService.getFileUrl(blog.getTumbnail()));
+                    if (blog.getTumbnail() != null) response.setTumbnailUrl(storageService.getFileUrl(blog.getTumbnail()));
+                    response.setAuthor(new UserResponse(blog.getUser()));
+                    response.setCategory(new BlogCategoryResponse(blog.getCategory()));
                     return response;
                 })
                 .toList();
@@ -66,7 +68,9 @@ public class BlogServiceImpl implements BlogService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Blog not found"));
 
         BlogResponse response = new BlogResponse(blog);
-        response.setTumbnailUrl(storageService.getFileUrl(blog.getTumbnail()));
+        if (blog.getTumbnail() != null) response.setTumbnailUrl(storageService.getFileUrl(blog.getTumbnail()));
+        response.setAuthor(new UserResponse(blog.getUser()));
+        response.setCategory(new BlogCategoryResponse(blog.getCategory()));
 
         return response;
     }
@@ -86,9 +90,9 @@ public class BlogServiceImpl implements BlogService {
 
         String tumbnailName = null;
 
-        if(blogRequest.getTumbnail() != null){
-            tumbnailName = "blog/" + formattedDate + "/" + blogSlugs + "-tumbnail-" + blogRequest.getTumbnail().getOriginalFilename();
-            storageService.uploadFile(tumbnailName,blogRequest.getTumbnail().getInputStream(), blogRequest.getTumbnail().getContentType());
+        if(blogRequest.getThumbnailFile() != null){
+            tumbnailName = "blog/" + formattedDate + "/" + blogSlugs + "-tumbnail-" + blogRequest.getThumbnailFile().getOriginalFilename();
+            storageService.uploadFile(tumbnailName,blogRequest.getThumbnailFile().getInputStream(), blogRequest.getThumbnailFile().getContentType());
         }
 
         Blog blog = Blog.builder()
@@ -106,7 +110,8 @@ public class BlogServiceImpl implements BlogService {
 
 
         BlogResponse response = new BlogResponse(savedBlog);
-        response.setTumbnailUrl(storageService.getFileUrl(savedBlog.getTumbnail()));
+        if (savedBlog.getTumbnail() != null) response.setTumbnailUrl(storageService.getFileUrl(savedBlog.getTumbnail()));
+
         return response;
     }
 
@@ -115,6 +120,7 @@ public class BlogServiceImpl implements BlogService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
         LocalDate currentDate = LocalDate.now();
         String formattedDate = currentDate.format(formatter);
+
         Blog blog = BlogRepository.findBlogBySlugs(slugs)
                 .orElseThrow(() -> new RuntimeException("Blog not found"));
 
@@ -132,21 +138,21 @@ public class BlogServiceImpl implements BlogService {
             blog.setUser(user);
         }
 
-        if (blogRequest.getTumbnail() != null) {
+        if (blogRequest.getThumbnailFile() != null) {
 
             if (blog.getTumbnail() != null) {
                 storageService.deleteFile(blog.getTumbnail());
             }
 
-            String tumbnailName = "blog/" + formattedDate + "/" + slugs + "-tumbnail-" + blogRequest.getTumbnail().getOriginalFilename();
-            storageService.uploadFile(tumbnailName, blogRequest.getTumbnail().getInputStream(), blogRequest.getTumbnail().getContentType());
+            String tumbnailName = "blog/" + formattedDate + "/" + slugs + "-tumbnail-" + blogRequest.getThumbnailFile().getOriginalFilename();
+            storageService.uploadFile(tumbnailName, blogRequest.getThumbnailFile().getInputStream(), blogRequest.getThumbnailFile().getContentType());
             blog.setTumbnail(tumbnailName);
         }
 
         BlogRepository.save(blog);
 
         BlogResponse response = new BlogResponse(blog);
-        response.setTumbnailUrl(storageService.getFileUrl(blog.getTumbnail()));
+        if (blog.getTumbnail() != null) response.setTumbnailUrl(storageService.getFileUrl(blog.getTumbnail()));
 
         return response;
     }

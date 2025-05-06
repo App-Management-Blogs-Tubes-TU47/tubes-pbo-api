@@ -55,7 +55,7 @@ public class BlogController {
 //    =========================
     @GetMapping("/{slugs}")
     public WebResponse<BlogResponse> getBlogBySlugs(
-            @RequestParam("slugs") String slugs
+            @PathVariable("slugs") String slugs
     ) {
         BlogResponse blogResponse = blogService.getBlogBySlugs(slugs);
         return WebResponse.<BlogResponse>builder()
@@ -91,7 +91,7 @@ public class BlogController {
      @PatchMapping(value = "/{slugs}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
      public WebResponse<BlogResponse> updateBlog(
              @PathVariable("slugs") String slugs,
-             @RequestBody BlogRequest blogRequest
+             @ModelAttribute BlogRequest blogRequest
      ) throws IOException {
          BlogResponse blogResponse = blogService.updateBlog(slugs, blogRequest);
          return WebResponse.<BlogResponse>builder()
