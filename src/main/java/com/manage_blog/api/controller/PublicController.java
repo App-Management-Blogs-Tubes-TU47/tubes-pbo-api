@@ -1,5 +1,6 @@
 package com.manage_blog.api.controller;
 
+import com.manage_blog.api.enums.StatusEnum;
 import com.manage_blog.api.model.*;
 import com.manage_blog.api.service.BlogCategoryService;
 import com.manage_blog.api.service.BlogService;
@@ -75,7 +76,8 @@ public class PublicController {
             @RequestParam (value = "size", required = false, defaultValue = "10") Integer size,
             @RequestParam (value = "search", required = false) String search,
             @RequestParam (value = "category", required = false) String category,
-            @RequestParam (value = "author", required = false) String author
+            @RequestParam (value = "author", required = false) String author,
+            @RequestParam(value = "status", required = false) StatusEnum status
     ) {
         try {
             if (page < 1){
@@ -89,7 +91,8 @@ public class PublicController {
                     size,
                     search,
                     category,
-                    author
+                    author,
+                    status
             );
             return WebResponse.<ListResponse<List<BlogResponse>>>builder()
                     .status(200)
@@ -98,6 +101,30 @@ public class PublicController {
                     .build();
         } catch (Exception e) {
             return WebResponse.<ListResponse<List<BlogResponse>>>builder()
+                    .status(500)
+                    .error(e.getMessage())
+                    .build();
+        }
+    }
+
+
+    //    =========================
+//    Get Blog By Slugs
+//    @Params slugs
+//    =========================
+    @GetMapping("/blogs/{slugs}")
+    public WebResponse<BlogResponse> getBlogBySlugs(
+            @PathVariable("slugs") String slugs
+    ) {
+        try {
+            BlogResponse blogResponse = blogService.getBlogBySlugs(slugs);
+            return WebResponse.<BlogResponse>builder()
+                    .status(200)
+                    .message("Success")
+                    .data(blogResponse)
+                    .build();
+        } catch (Exception e) {
+            return WebResponse.<BlogResponse>builder()
                     .status(500)
                     .error(e.getMessage())
                     .build();
@@ -133,7 +160,7 @@ public class PublicController {
     //    Get User By ID
     //    @Params id
     //    =========================
-    @GetMapping("/{username}")
+    @GetMapping("/author/{username}")
     public WebResponse<UserResponse> getUserByUsername(
             @PathVariable("username") String username
     ) {

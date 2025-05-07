@@ -1,5 +1,6 @@
 package com.manage_blog.api.controller;
 
+import com.manage_blog.api.enums.StatusEnum;
 import com.manage_blog.api.model.BlogRequest;
 import com.manage_blog.api.model.BlogResponse;
 import com.manage_blog.api.model.ListResponse;
@@ -30,7 +31,8 @@ public class BlogController {
             @RequestParam (value = "size", required = false, defaultValue = "10") Integer size,
             @RequestParam (value = "search", required = false) String search,
             @RequestParam (value = "category", required = false) String category,
-            @RequestParam (value = "author", required = false) String author
+            @RequestParam (value = "author", required = false) String author,
+            @RequestParam(value = "status", required = false) StatusEnum status
     ) {
         try {
             if (page < 1){
@@ -44,7 +46,8 @@ public class BlogController {
                     size,
                     search,
                     category,
-                    author
+                    author,
+                    status
             );
             return WebResponse.<ListResponse<List<BlogResponse>>>builder()
                     .status(200)

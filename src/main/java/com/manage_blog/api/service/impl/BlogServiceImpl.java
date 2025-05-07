@@ -1,6 +1,7 @@
 package com.manage_blog.api.service.impl;
 
 import com.manage_blog.api.entity.*;
+import com.manage_blog.api.enums.StatusEnum;
 import com.manage_blog.api.model.*;
 import com.manage_blog.api.repository.*;
 import com.manage_blog.api.service.*;
@@ -43,10 +44,10 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     @Transactional
-    public ListResponse<List<BlogResponse>> getBlogList(int page, int size, String search, String category, String author) {
+    public ListResponse<List<BlogResponse>> getBlogList(int page, int size, String search, String category, String author, StatusEnum status) {
 
         PageRequest pageRequest = PageRequest.of(page - 1, size);
-        Page<Blog> blogPage = blogRepository.findBySearch(search, pageRequest, category, author);
+        Page<Blog> blogPage = blogRepository.findBySearch(search, pageRequest, category, author, status);
 
         List<BlogResponse> blogResponse = blogPage.getContent().stream()
                 .map(blog -> {

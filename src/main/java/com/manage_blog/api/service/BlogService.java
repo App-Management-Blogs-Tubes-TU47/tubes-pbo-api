@@ -1,5 +1,6 @@
 package com.manage_blog.api.service;
 
+import com.manage_blog.api.enums.StatusEnum;
 import com.manage_blog.api.model.BlogRequest;
 import com.manage_blog.api.model.BlogResponse;
 import com.manage_blog.api.model.ListResponse;
@@ -11,7 +12,7 @@ import java.util.List;
 @Service
 public interface BlogService {
     ListResponse<List<BlogResponse>> getBlogList(
-            int page, int size, String search, String category, String author
+            int page, int size, String search, String category, String author, StatusEnum status
     );
 
     BlogResponse getBlogBySlugs(String slugs);

@@ -2,6 +2,7 @@ package com.manage_blog.api.repository;
 
 import com.manage_blog.api.entity.Blog;
 import com.manage_blog.api.entity.Users;
+import com.manage_blog.api.enums.StatusEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,11 +22,12 @@ public interface BlogRepository extends JpaRepository<Blog, String>, JpaSpecific
             "LOWER(u.category.slugs) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
             "LOWER(u.user.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
             "LOWER(u.slugs) LIKE LOWER(CONCAT('%', :search, '%')) )" +
+            " AND (:status IS NULL OR :status = '' OR u.status = :status)" +
             " AND (:category IS NULL OR :category = '' OR LOWER(u.category.slugs) = LOWER(:category))" +
             " AND (:author IS NULL OR :author = '' OR LOWER(u.user.username) = LOWER(:author))"
     )
     Page<Blog> findBySearch(@Param("search") String search, PageRequest pageRequest,
-                            @Param("category") String category, @Param("author") String author);
+                            @Param("category") String category, @Param("author") String author, @Param("status")StatusEnum status);
 
     @Query("""
             SELECT b AS blog, COUNT(c) AS commentCount

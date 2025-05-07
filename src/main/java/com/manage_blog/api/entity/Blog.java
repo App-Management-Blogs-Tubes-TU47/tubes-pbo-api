@@ -35,7 +35,7 @@ public class Blog extends BaseEntity {
     @Column(name = "tumbnail", length = 500, nullable = true)
     private String tumbnail;
 
-    @Column(name = "article", length = 1000)
+    @Column(name = "article", length = 50000)
     private String article;
 
     @Enumerated(EnumType.STRING)
