@@ -16,7 +16,6 @@ import java.util.List;
 public class BlogController {
     private BlogService blogService;
 
-
     public BlogController(BlogService blogService) {
         this.blogService = blogService;
     }
@@ -29,7 +28,9 @@ public class BlogController {
     public WebResponse<ListResponse<List<BlogResponse>>> getAllBlogs(
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam (value = "size", required = false, defaultValue = "10") Integer size,
-            @RequestParam (value = "search", required = false) String search
+            @RequestParam (value = "search", required = false) String search,
+            @RequestParam (value = "category", required = false) String category,
+            @RequestParam (value = "author", required = false) String author
     ) {
         try {
             if (page < 1){
@@ -41,7 +42,9 @@ public class BlogController {
             ListResponse<List<BlogResponse>> listResponse = blogService.getBlogList(
                     page,
                     size,
-                    search
+                    search,
+                    category,
+                    author
             );
             return WebResponse.<ListResponse<List<BlogResponse>>>builder()
                     .status(200)

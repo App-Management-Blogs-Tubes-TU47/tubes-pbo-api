@@ -17,8 +17,15 @@ public interface BlogRepository extends JpaRepository<Blog, String>, JpaSpecific
             "u.deletedAt IS NULL AND (" +
             ":search IS NULL OR :search = '' OR " +
             "LOWER(u.title) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-            "LOWER(u.slugs) LIKE LOWER(CONCAT('%', :search, '%')) )")
-    Page<Blog> findBySearch(@Param("search") String search, PageRequest pageRequest);
+            "LOWER(u.category.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(u.category.slugs) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(u.user.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(u.slugs) LIKE LOWER(CONCAT('%', :search, '%')) )" +
+            " AND (:category IS NULL OR :category = '' OR LOWER(u.category.slugs) = LOWER(:category))" +
+            " AND (:author IS NULL OR :author = '' OR LOWER(u.user.username) = LOWER(:author))"
+    )
+    Page<Blog> findBySearch(@Param("search") String search, PageRequest pageRequest,
+                            @Param("category") String category, @Param("author") String author);
 
     @Query("""
             SELECT b AS blog, COUNT(c) AS commentCount

@@ -43,10 +43,10 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     @Transactional
-    public ListResponse<List<BlogResponse>> getBlogList(int page, int size, String search) {
+    public ListResponse<List<BlogResponse>> getBlogList(int page, int size, String search, String category, String author) {
 
         PageRequest pageRequest = PageRequest.of(page - 1, size);
-        Page<Blog> blogPage = blogRepository.findBySearch(search, pageRequest);
+        Page<Blog> blogPage = blogRepository.findBySearch(search, pageRequest, category, author);
 
         List<BlogResponse> blogResponse = blogPage.getContent().stream()
                 .map(blog -> {

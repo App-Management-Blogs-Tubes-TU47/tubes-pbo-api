@@ -10,22 +10,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
-//    @Bean
-//    GroupedOpenApi publicApi() {
-//        return GroupedOpenApi.builder()
-//                .group("public")
-//                .pathsToMatch("/api/v1/**")
-//                .build();
-//    }
-//
-//    @Bean
-//    OpenAPI customOpenAPI() {
-//        return new OpenAPI()
-//                .info(new Info()
-//                        .title("Blog API")
-//                        .version("1.0")
-//                        .description("API documentation for the Blog application"));
-//    }
 
     private static final String SECURITY_SCHEME_NAME = "bearerAuth";
 

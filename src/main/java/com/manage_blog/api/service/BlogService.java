@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public interface BlogService {
     ListResponse<List<BlogResponse>> getBlogList(
-            int page, int size, String search
+            int page, int size, String search, String category, String author
     );
 
     BlogResponse getBlogBySlugs(String slugs);
