@@ -33,6 +33,9 @@ public class BlogServiceImpl implements BlogService {
     private BlogCategoryRepository blogCategoryRepository;
 
     @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
     private CreateSlugService createSlugService;
 
     @Autowired
@@ -47,8 +50,10 @@ public class BlogServiceImpl implements BlogService {
 
         List<BlogResponse> blogResponse = blogPage.getContent().stream()
                 .map(blog -> {
+                    long commentCount = commentRepository.countCommentByBlog(blog.getSlugs());
                     BlogResponse response = new BlogResponse(blog);
                     if (blog.getTumbnail() != null) response.setTumbnailUrl(storageService.getFileUrl(blog.getTumbnail()));
+                    response.setCountComments(commentCount);
                     response.setAuthorName(blog.getUser().getName());
                     response.setAuthorUsername(blog.getUser().getUsername());
                     response.setCategoryName(blog.getCategory().getName());

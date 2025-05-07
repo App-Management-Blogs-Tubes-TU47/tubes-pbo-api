@@ -20,6 +20,18 @@ public interface BlogRepository extends JpaRepository<Blog, String>, JpaSpecific
             "LOWER(u.slugs) LIKE LOWER(CONCAT('%', :search, '%')) )")
     Page<Blog> findBySearch(@Param("search") String search, PageRequest pageRequest);
 
+    @Query("""
+            SELECT b AS blog, COUNT(c) AS commentCount
+            FROM Blog b
+            LEFT JOIN Comment c ON c.blog = b
+            WHERE b.deletedAt IS NULL
+              AND (:search IS NULL OR :search = '' 
+                   OR LOWER(b.title) LIKE LOWER(CONCAT('%', :search, '%')) 
+                   OR LOWER(b.slugs) LIKE LOWER(CONCAT('%', :search, '%')))
+            GROUP BY b """)
+    Page<Blog> findBySearchWithCommentCount(@Param("search") String search, PageRequest pageable);
+
+
     @Query("SELECT b FROM Blog b WHERE b.slugs = :slugs"
     + " AND b.deletedAt IS NULL")
     Optional<Blog> findBlogBySlugs(@Param("slugs") String slugs);

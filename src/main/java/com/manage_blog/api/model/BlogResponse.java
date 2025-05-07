@@ -30,6 +30,7 @@ public class BlogResponse {
     private BlogCategoryResponse category;
     private String categoryName;
     private String categorySlugs;
+    private long CountComments;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

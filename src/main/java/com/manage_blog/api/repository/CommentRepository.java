@@ -14,4 +14,9 @@ public interface CommentRepository extends JpaRepository<Comment, String>, JpaSp
                     "c.blog.slugs = :blogs")
     List<Comment> selectCommentByBlog(@Param("blogs") String blogs);
 
+
+    @Query("SELECT COUNT(c) FROM Comment c WHERE " +
+            "c.blog.slugs = :blogs")
+    Long countCommentByBlog(@Param("blogs") String blogs);
+
 }
