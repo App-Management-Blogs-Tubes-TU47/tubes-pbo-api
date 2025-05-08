@@ -14,7 +14,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // berlaku untuk semua endpoint
-                        .allowedOrigins("http://localhost:5173") // atau "*" http://localhost:5173/
+                        .allowedOrigins("http://localhost:5173/") // atau "*" http://localhost:5173/
                         .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);

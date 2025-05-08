@@ -82,7 +82,10 @@ public class UserServiceImpl implements UserService {
     ) {
         Users user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        return new UserResponse(user);
+        UserResponse response = new UserResponse(user);
+        if (user.getProfile() != null) response.setProfileUrl(storageService.getFileUrl(user.getProfile()));
+
+        return response;
     }
 
 
