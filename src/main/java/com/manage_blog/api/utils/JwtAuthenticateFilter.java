@@ -33,20 +33,25 @@ public class JwtAuthenticateFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            String username = jwtUtils.getUsernameFromToken(token);
+        try{
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                Users user = userRepository.findByUsername(username).orElse(null);
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                String username = jwtUtils.getUsernameFromToken(token);
 
-                if (user != null && jwtUtils.validateToken(token, user)) {
-                    UsernamePasswordAuthenticationToken authenticationToken =
-                            new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    Users user = userRepository.findByUsername(username).orElse(null);
+
+                    if (user != null && jwtUtils.validateToken(token, user)) {
+                        UsernamePasswordAuthenticationToken authenticationToken =
+                                new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    }
                 }
             }
+        } catch (Exception ex){
+            logger.warn(ex.getMessage());
         }
 
         filterChain.doFilter(request, response);
