@@ -1,6 +1,7 @@
 package com.manage_blog.api.config;
 
 import com.manage_blog.api.utils.JwtAuthenticateFilter;
+import com.manage_blog.api.utils.JwtAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,10 +20,16 @@ public class SecurityConfig {
 
     private final JwtAuthenticateFilter jwtFilter;
     private final UserDetailsService userDetailsService;
+    private final JwtAuthenticationEntryPoint unauthorizedHandler;
 
-    public SecurityConfig(JwtAuthenticateFilter jwtFilter, UserDetailsService userDetailsService) {
+
+    public SecurityConfig(
+            JwtAuthenticateFilter jwtFilter,
+            UserDetailsService userDetailsService,
+            JwtAuthenticationEntryPoint unauthorizedHandler) {
         this.jwtFilter = jwtFilter;
         this.userDetailsService = userDetailsService;
+        this.unauthorizedHandler = unauthorizedHandler;
     }
 
 
@@ -31,6 +38,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf-> csrf.disable()) // disable CSRF for APIs (enable for web apps)
                 .cors(Customizer.withDefaults())
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(unauthorizedHandler)
+                )
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers(
                                         "/api/v1/auth/**",
