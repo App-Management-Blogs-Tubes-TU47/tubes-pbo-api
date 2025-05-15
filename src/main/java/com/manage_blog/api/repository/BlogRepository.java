@@ -3,6 +3,7 @@ package com.manage_blog.api.repository;
 import com.manage_blog.api.entity.Blog;
 import com.manage_blog.api.entity.Users;
 import com.manage_blog.api.enums.StatusEnum;
+import com.manage_blog.api.model.DashboardBlogCountResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public interface BlogRepository extends JpaRepository<Blog, String>, JpaSpecificationExecutor<Blog> {
@@ -45,6 +48,24 @@ public interface BlogRepository extends JpaRepository<Blog, String>, JpaSpecific
     + " AND b.deletedAt IS NULL")
     Optional<Blog> findBlogBySlugs(@Param("slugs") String slugs);
 
+    @Query("""
+        SELECT new com.manage_blog.api.model.DashboardBlogCountResponse(
+             MONTH(b.createdAt) - 1, COUNT(b)
+        )
+        FROM Blog b
+        WHERE year(b.createdAt) = year(CURRENT_DATE)
+        GROUP BY MONTH(b.createdAt)
+        ORDER BY MONTH(b.createdAt)
+""")
+    List<DashboardBlogCountResponse> listBlogCountByMonthInCurrentYear();
+
+    @Query("""
+        SELECT b FROM Blog b
+        WHERE b.user.username = :username
+        AND b.createdAt >= CURRENT_DATE
+        ORDER BY b.createdAt DESC
+""")
+    List<Blog> listBlogLatestByCreatedAtDesc(@Param("username") String username);
 }
 
 

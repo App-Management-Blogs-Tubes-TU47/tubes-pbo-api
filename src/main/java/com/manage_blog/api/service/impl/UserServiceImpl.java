@@ -139,12 +139,25 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUser(
             String username,
             UserCreateRequest u
-    ) {
+    ) throws IOException {
         Users user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found"));
 
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        LocalDate currentDate = LocalDate.now();
+        String formattedDate = currentDate.format(formatter);
+
+        String generatedPath = null;
+
         // Update user details
         NullAwareBeanUtils.copyNonNullProperties(u, user);
+
+        if(u.getProfile() != null) {
+            generatedPath = "profile/" + formattedDate + "/" + u.getUsername() + u.getProfile().getContentType();
+            storageService.uploadFile(generatedPath, u.getProfile().getInputStream(), u.getProfile().getContentType());
+            user.setProfile(generatedPath);
+        }
 
         // Encrypt the password using bcrypt
         if(u.getPassword() != null){

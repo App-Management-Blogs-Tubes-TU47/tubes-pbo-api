@@ -1,5 +1,6 @@
 package com.manage_blog.api.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.manage_blog.api.entity.Users;
 import com.manage_blog.api.enums.RoleEnum;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponse {
 
     private String id;

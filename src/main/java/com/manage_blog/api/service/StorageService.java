@@ -42,6 +42,7 @@ public class StorageService {
                     .bucket(bucketName)
                     .object(objectName)
                     .method(Method.GET)
+                    .expiry(60 * 60 * 24)
                     .build();
             return minioClient.getPresignedObjectUrl(args);
         } catch (Exception e) {

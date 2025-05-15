@@ -61,7 +61,7 @@ public class BlogCategoryController {
     // ==========================
     @GetMapping("/{slugs}")
     public WebResponse<BlogCategoryResponse> getBlogCategoryBySlugs(
-            @RequestParam("slugs") String slugs
+            @PathVariable("slugs") String slugs
     ) {
         try {
             BlogCategoryResponse blogCategoryResponse = blogCategoryService.getCategoryBySlugs(slugs);

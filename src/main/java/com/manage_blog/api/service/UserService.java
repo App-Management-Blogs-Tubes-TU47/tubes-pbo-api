@@ -21,7 +21,7 @@ public interface UserService {
 
     UserResponse createUser(UserCreateRequest userCreateRequest) throws IOException;
 
-    UserResponse updateUser(String username, UserCreateRequest userCreateRequest);
+    UserResponse updateUser(String username, UserCreateRequest userCreateRequest) throws IOException;
 
     void deleteUser(String username);
 }

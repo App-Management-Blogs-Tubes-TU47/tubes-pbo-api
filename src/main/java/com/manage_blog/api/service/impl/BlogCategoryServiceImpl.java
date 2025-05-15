@@ -74,6 +74,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Blog category not found"));
 
         NullAwareBeanUtils.copyNonNullProperties(blogCategory, blogCategory);
+        blogCategory.setName(blogCategoryRequest.getName());
         blogCategory.setSlugs(createSlugService.createSlug(blogCategoryRequest.getName()));
 
         blogCategoryRepository.save(blogCategory);

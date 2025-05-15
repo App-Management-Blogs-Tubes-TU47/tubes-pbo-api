@@ -38,6 +38,10 @@ public class Users extends BaseEntity implements UserDetails  {
     @Column(name= "role")
     private RoleEnum role;
 
+    @OneToMany
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private List<Blog> blogs;
+
     @Column(name = "profile", length = 500, nullable = true)
     private String profile;
 

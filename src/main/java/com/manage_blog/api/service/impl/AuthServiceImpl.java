@@ -8,6 +8,7 @@ import com.manage_blog.api.model.AuthResponse;
 import com.manage_blog.api.model.UserResponse;
 import com.manage_blog.api.repository.UserRepository;
 import com.manage_blog.api.service.AuthService;
+import com.manage_blog.api.service.StorageService;
 import com.manage_blog.api.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Autowired
+    private StorageService storageService;
+
     @Override
     @Transactional
     public AuthResponse login(AuthLoginRequest a) {
@@ -43,6 +47,13 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtUtils.generateToken(user);
 
         UserResponse users = new UserResponse(user);
+
+        if (user.getProfile() != null) {
+            users.setProfileUrl(storageService.getFileUrl(user.getProfile()));
+        } else {
+            users.setProfileUrl(null);
+        }
+
         AuthResponse authResponse = AuthResponse.builder()
                 .token(token)
                 .user(users)
