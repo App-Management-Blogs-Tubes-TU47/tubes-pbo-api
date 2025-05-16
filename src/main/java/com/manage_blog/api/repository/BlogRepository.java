@@ -14,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface BlogRepository extends JpaRepository<Blog, String>, JpaSpecificationExecutor<Blog> {
 
@@ -53,16 +54,19 @@ public interface BlogRepository extends JpaRepository<Blog, String>, JpaSpecific
              MONTH(b.createdAt) - 1, COUNT(b)
         )
         FROM Blog b
-        WHERE year(b.createdAt) = year(CURRENT_DATE)
+        WHERE (:username IS NULL OR b.user.username = :username)
+        AND year(b.createdAt) = year(CURRENT_DATE)
         GROUP BY MONTH(b.createdAt)
         ORDER BY MONTH(b.createdAt)
 """)
-    List<DashboardBlogCountResponse> listBlogCountByMonthInCurrentYear();
+    List<DashboardBlogCountResponse> listBlogCountByMonthInCurrentYear(@Param("username") String username);
 
     @Query("""
         SELECT b FROM Blog b
-        WHERE b.user.username = :username
+        JOIN Users u on b.user = u
+        WHERE (:username IS NULL OR u.username = :username)
         AND b.createdAt >= CURRENT_DATE
+        GROUP BY b.id, b.title, b.slugs, b.category, b.createdAt, b.user
         ORDER BY b.createdAt DESC
 """)
     List<Blog> listBlogLatestByCreatedAtDesc(@Param("username") String username);

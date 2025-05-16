@@ -6,7 +6,9 @@ import com.manage_blog.api.model.*;
 import com.manage_blog.api.repository.BlogRepository;
 import com.manage_blog.api.repository.UserRepository;
 import com.manage_blog.api.service.DashboardService;
+import com.manage_blog.api.service.StorageService;
 import com.manage_blog.api.utils.JwtUtils;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +35,13 @@ public class DashboardServiceImpl implements DashboardService {
     private JwtUtils jwtUtils;
 
     @Autowired
+    private StorageService storageService;
+
+    @Autowired
     private static final Logger logger = LoggerFactory.getLogger(DashboardServiceImpl.class);
 
     @Override
+    @Transactional
     public DashboardResponse getDashboardData(String token) {
 
         logger.info("Testing Dashboard Service");
@@ -46,19 +52,28 @@ public class DashboardServiceImpl implements DashboardService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         boolean isAdmin = users.getRole() == RoleEnum.ADMIN;
-        String targetUsername = isAdmin ? null : username;
+        String targetUsername = isAdmin ? null : users.getUsername();
 
-        List<DashboardUserLeaderboardResponse> userResponse = userRepository.findUsersByCurrentYear();
-        List<UserResponse> userResponses = userRepository.findLatestUsersByCreatedAtDesc().stream()
-                .map(UserResponse::new)
+        List<DashboardUserLeaderboardResponse> userResponse = userRepository.findUsersByCurrentYear().stream()
+                .map(user -> {
+                    DashboardUserLeaderboardResponse response = new DashboardUserLeaderboardResponse(user);
+                    if(user.getProfileUrl() != null) response.setProfileUrl(storageService.getFileUrl(user.getProfileUrl()));
+                    return response;
+                })
                 .toList();
-        List<BlogResponse> blogResponses = blogRepository.listBlogLatestByCreatedAtDesc(users.getUsername()).stream()
+
+
+
+//        List<UserResponse> userResponses = userRepository.findLatestUsersByCreatedAtDesc().stream()
+//                .map(UserResponse::new)
+//                .toList();
+        List<BlogResponse> blogResponses = blogRepository.listBlogLatestByCreatedAtDesc(targetUsername).stream()
                 .map(BlogResponse::new)
                 .toList();
 
 
 //        chart for blogs
-        List<DashboardBlogCountResponse> blogCountResponse = blogRepository.listBlogCountByMonthInCurrentYear();
+        List<DashboardBlogCountResponse> blogCountResponse = blogRepository.listBlogCountByMonthInCurrentYear(targetUsername);
         Map<Integer, Long> countMap = blogCountResponse.stream()
                 .collect(Collectors.toMap(DashboardBlogCountResponse::getTitle, DashboardBlogCountResponse::getCount));
 
@@ -67,10 +82,9 @@ public class DashboardServiceImpl implements DashboardService {
             completeList.add(new DashboardBlogCountResponse(i, countMap.getOrDefault(i, 0L)));
         }
 
-//        logger.info("User Response: {}", userRepository.findUsersByCurrentYear().toString());
         return DashboardResponse.builder()
                 .leaderboard(userResponse)
-                .users(userResponses)
+//                .users(userResponses)
                 .countBlogs(completeList)
                 .blogs(blogResponses)
                 .build();

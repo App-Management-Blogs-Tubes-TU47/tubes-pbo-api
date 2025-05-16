@@ -28,12 +28,12 @@ public interface UserRepository extends JpaRepository<Users, String>, JpaSpecifi
 
     @Query("""
         SELECT new com.manage_blog.api.model.DashboardUserLeaderboardResponse(
-            u.id, u.name, u.username, u.email, u.createdAt, COUNT(b)
+            u.id, u.name, u.username, u.email, u.profile, u.createdAt, COUNT(b)
         )
         FROM Users u
         LEFT JOIN Blog b ON b.user = u AND year(b.createdAt) = year(CURRENT_DATE)
         WHERE year(b.createdAt) = year(CURRENT_DATE)
-        GROUP BY u.id, u.name, u.username, u.email, u.createdAt
+        GROUP BY u.id, u.name, u.username, u.email, u.profile, u.createdAt
         ORDER BY COUNT(b) DESC
     """)
     List<DashboardUserLeaderboardResponse> findUsersByCurrentYear();
