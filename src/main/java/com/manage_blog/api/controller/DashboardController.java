@@ -23,7 +23,6 @@ public class DashboardController {
     public WebResponse<DashboardResponse> getDashboardData(
             @RequestHeader("Authorization") String token
     ) {
-        try {
             String newtoken = token.substring(7);
 
             DashboardResponse dashboardResponse = dashboardService.getDashboardData(newtoken);
@@ -32,12 +31,6 @@ public class DashboardController {
                     .message("Success")
                     .data(dashboardResponse)
                     .build();
-        } catch (Exception e) {
-            return WebResponse.<DashboardResponse>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
     }
 
 }

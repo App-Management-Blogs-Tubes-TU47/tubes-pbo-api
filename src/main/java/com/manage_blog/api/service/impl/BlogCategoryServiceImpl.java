@@ -30,7 +30,6 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
 
     @Transactional
     public ListResponse<List<BlogCategoryResponse>> getCategoryList(int page, int size, String search) {
-
         PageRequest pageRequest = PageRequest.of(page - 1, size);
         Page<BlogCategory> categoryPage= blogCategoryRepository.findBySearch(search, pageRequest);
 
@@ -38,7 +37,6 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
                 .map(BlogCategoryResponse::new)
                 .toList();
 
-        // Prepare pagination response
         PaginationResponse paginationResponse = PaginationResponse.builder()
                 .page(page)
                 .size(size)
@@ -59,9 +57,16 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
 
     @Transactional
     public BlogCategoryResponse createCategory(BlogCategoryRequest blogCategoryRequest) {
+
+        if (blogCategoryRepository.findExistingByName(blogCategoryRequest.getName())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Blog category already exists");
+        }
+
         BlogCategory blogCategory = new BlogCategory();
         blogCategory.setName(blogCategoryRequest.getName());
-        blogCategory.setSlugs(createSlugService.createSlug(blogCategoryRequest.getName()));
+        blogCategory.setSlugs(
+                createSlugService.createSlug(blogCategoryRequest.getName())
+        );
 
         blogCategoryRepository.save(blogCategory);
 
@@ -71,11 +76,15 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
     @Transactional
     public BlogCategoryResponse updateCategory(String slugs, BlogCategoryRequest blogCategoryRequest) {
         BlogCategory blogCategory = blogCategoryRepository.findBlogCategoryBySlugs(slugs)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Blog category not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Blog category not found"
+                ));
 
         NullAwareBeanUtils.copyNonNullProperties(blogCategory, blogCategory);
         blogCategory.setName(blogCategoryRequest.getName());
-        blogCategory.setSlugs(createSlugService.createSlug(blogCategoryRequest.getName()));
+        blogCategory.setSlugs(
+                createSlugService.createSlug(blogCategoryRequest.getName())
+        );
 
         blogCategoryRepository.save(blogCategory);
 
@@ -85,9 +94,9 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
     @Transactional
     public void deleteCategory(String slugs) {
         BlogCategory blogCategory = blogCategoryRepository.findBlogCategoryBySlugs(slugs)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Blog category not found"));
-
-
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Blog category not found"
+                ));
         blogCategory.setDeletedAt(LocalDateTime.now());
         blogCategoryRepository.save(blogCategory);
     }

@@ -9,6 +9,7 @@ import com.manage_blog.api.service.impl.UserServiceImpl;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -64,19 +65,12 @@ public class UserController {
     public WebResponse<UserResponse> getUserByUsername(
             @PathVariable("username") String username
     ) {
-        try {
             UserResponse userResponse = userService.getUserByUsername(username);
             return WebResponse.<UserResponse>builder()
                     .status(200)
                     .message("Success")
                     .data(userResponse)
                     .build();
-        } catch (Exception e) {
-            return WebResponse.<UserResponse>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
     }
 
 //    =========================
@@ -88,20 +82,13 @@ public class UserController {
     )
     public WebResponse<UserResponse> createUser(
             @ModelAttribute UserCreateRequest user
-    ) {
-        try {
+    ) throws IOException{
             UserResponse userResponse = userService.createUser(user);
             return WebResponse.<UserResponse>builder()
                     .status(200)
                     .message("Success")
                     .data(userResponse)
                     .build();
-        } catch (Exception e) {
-            return WebResponse.<UserResponse>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
     }
 
 //    =========================
@@ -113,20 +100,14 @@ public class UserController {
     public WebResponse<UserResponse> updateUser(
             @PathVariable("username") String username,
             @ModelAttribute UserCreateRequest userCreateRequest
-    ) {
-        try {
-            UserResponse userResponse = userService.updateUser(username, userCreateRequest);
-            return WebResponse.<UserResponse>builder()
-                    .status(200)
-                    .message("Success")
-                    .data(userResponse)
-                    .build();
-        } catch (Exception e) {
-            return WebResponse.<UserResponse>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
+    ) throws IOException {
+        UserResponse userResponse = userService.updateUser(username, userCreateRequest);
+        return WebResponse.<UserResponse>builder()
+                .status(200)
+                .message("Success")
+                .data(userResponse)
+                .build();
+
     }
 
 //    =========================
@@ -137,19 +118,12 @@ public class UserController {
     public WebResponse<String> deleteUser(
             @PathVariable("username") String username
     ) {
-        try {
             userService.deleteUser(username);
             return WebResponse.<String>builder()
                     .status(200)
                     .message("Success")
                     .data("User with username " + username + " has been deleted")
                     .build();
-        } catch (Exception e) {
-            return WebResponse.<String>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
     }
 
 }

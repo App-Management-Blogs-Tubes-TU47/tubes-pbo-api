@@ -27,19 +27,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public WebResponse<AuthResponse> login(@RequestBody AuthLoginRequest authLoginRequest) {
-        try {
-            AuthResponse authResponse = authService.login(authLoginRequest);
-            return WebResponse.<AuthResponse>builder()
-                    .status(200)
-                    .message("Success")
-                    .data(authResponse)
-                    .build();
-        } catch (Exception e) {
-            return WebResponse.<AuthResponse>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
+        AuthResponse authResponse = authService.login(authLoginRequest);
+        return WebResponse.<AuthResponse>builder()
+                .status(200)
+                .message("Success")
+                .data(authResponse)
+                .build();
     }
 
 //    =========================
@@ -49,40 +42,33 @@ public class AuthController {
 
     @PostMapping("/register")
     public WebResponse<AuthResponse> register(@RequestBody AuthRegisterRequest auth) {
-        try {
-            AuthResponse authResponse = authService.register(auth);
-            return WebResponse.<AuthResponse>builder()
-                    .status(200)
-                    .message("Success")
-                    .data(authResponse)
-                    .build();
-        } catch (Exception e) {
-            return WebResponse.<AuthResponse>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
+        AuthResponse authResponse = authService.register(auth);
+        return WebResponse.<AuthResponse>builder()
+                .status(200)
+                .message("Success")
+                .data(authResponse)
+                .build();
     }
-
-//    =========================
-//    Logout
-//    @Params token
-//    =========================
-    @PostMapping("/logout")
-    public WebResponse<String> logout(@RequestBody String token) {
-        try {
-            authService.logout(token);
-            return WebResponse.<String>builder()
-                    .status(200)
-                    .message("Success")
-                    .data("Logout success")
-                    .build();
-        } catch (Exception e) {
-            return WebResponse.<String>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
-    }
+//
+////    =========================
+////    Logout
+////    @Params token
+////    =========================
+//    @PostMapping("/logout")
+//    public WebResponse<String> logout(@RequestBody String token) {
+//        try {
+//            authService.logout(token);
+//            return WebResponse.<String>builder()
+//                    .status(200)
+//                    .message("Success")
+//                    .data("Logout success")
+//                    .build();
+//        } catch (Exception e) {
+//            return WebResponse.<String>builder()
+//                    .status(500)
+//                    .error(e.getMessage())
+//                    .build();
+//        }
+//    }
 
 }

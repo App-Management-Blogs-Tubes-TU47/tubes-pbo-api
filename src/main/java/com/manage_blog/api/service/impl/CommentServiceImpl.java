@@ -39,7 +39,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public ListResponse<List<CommentResponse>> getCommentList(String blogSlug) {
-
         List<Comment> comments = commentRepository.selectCommentByBlog(blogSlug);
         List<CommentResponse> commentResponses = comments.stream()
                 .map(comment -> {
@@ -61,7 +60,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public CommentResponse createComment(CommentRequest commentRequest) {
-
         Users user = userRepository.findByUsername(commentRequest.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 

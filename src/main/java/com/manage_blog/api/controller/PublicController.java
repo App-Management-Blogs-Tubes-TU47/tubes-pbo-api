@@ -40,7 +40,6 @@ public class PublicController {
             @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
             @RequestParam(value = "search", required = false) String search
     ) {
-        try {
             if (page < 1) {
                 page = 1;
             }
@@ -57,12 +56,6 @@ public class PublicController {
                     .message("Success")
                     .data(listResponse)
                     .build();
-        } catch (Exception e) {
-            return WebResponse.<ListResponse<List<BlogCategoryResponse>>>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
     }
 
 
@@ -79,7 +72,6 @@ public class PublicController {
             @RequestParam (value = "author", required = false) String author,
             @RequestParam(value = "status", required = false) StatusEnum status
     ) {
-        try {
             if (page < 1){
                 page = 1;
             }
@@ -99,12 +91,6 @@ public class PublicController {
                     .message("Success")
                     .data(listResponse)
                     .build();
-        } catch (Exception e) {
-            return WebResponse.<ListResponse<List<BlogResponse>>>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
     }
 
 
@@ -116,19 +102,12 @@ public class PublicController {
     public WebResponse<BlogResponse> getBlogBySlugs(
             @PathVariable("slugs") String slugs
     ) {
-        try {
             BlogResponse blogResponse = blogService.getBlogBySlugs(slugs);
             return WebResponse.<BlogResponse>builder()
                     .status(200)
                     .message("Success")
                     .data(blogResponse)
                     .build();
-        } catch (Exception e) {
-            return WebResponse.<BlogResponse>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
     }
 
     //    =========================
@@ -139,7 +118,6 @@ public class PublicController {
     public WebResponse<ListResponse<List<CommentResponse>>> getAllComments(
             @PathVariable("blogSlug") String blogSlug
     ) {
-        try {
             ListResponse<List<CommentResponse>> listResponse = commentService.getCommentList(
                     blogSlug
             );
@@ -148,12 +126,6 @@ public class PublicController {
                     .message("Success")
                     .data(listResponse)
                     .build();
-        } catch (Exception e) {
-            return WebResponse.<ListResponse<List<CommentResponse>>>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
     }
 
     //    =========================
@@ -164,18 +136,11 @@ public class PublicController {
     public WebResponse<UserResponse> getUserByUsername(
             @PathVariable("username") String username
     ) {
-        try {
             UserResponse userResponse = userService.getUserByUsername(username);
             return WebResponse.<UserResponse>builder()
                     .status(200)
                     .message("Success")
                     .data(userResponse)
                     .build();
-        } catch (Exception e) {
-            return WebResponse.<UserResponse>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
     }
 }

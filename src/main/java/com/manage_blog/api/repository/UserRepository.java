@@ -26,6 +26,12 @@ public interface UserRepository extends JpaRepository<Users, String>, JpaSpecifi
     + " AND u.deletedAt IS NULL")
     Optional<Users> findByUsername(@Param("username") String username);
 
+    @Query(
+        "SELECT u FROM Users u WHERE u.email = :email"
+            + " OR u.username = :username"
+    )
+    Optional<Users> validateUnameEmailAlreadyExist(@Param("email") String email, @Param("username") String username );
+
     @Query("""
         SELECT new com.manage_blog.api.model.DashboardUserLeaderboardResponse(
             u.id, u.name, u.username, u.email, u.profile, u.createdAt, COUNT(b)

@@ -1,7 +1,6 @@
 package com.manage_blog.api.repository;
 
 import com.manage_blog.api.entity.BlogCategory;
-import com.manage_blog.api.entity.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,6 +22,10 @@ public interface BlogCategoryRepository extends JpaRepository<BlogCategory, Stri
     @Query("SELECT b FROM BlogCategory b WHERE b.slugs = :slugs"
     + " AND b.deletedAt IS NULL")
     Optional<BlogCategory> findBlogCategoryBySlugs(@Param("slugs") String slugs);
+
+    @Query("SELECT b FROM BlogCategory b WHERE b.name = :name"
+    + " AND b.deletedAt IS NULL")
+    boolean findExistingByName(@Param("name")  String name);
 
 }
 

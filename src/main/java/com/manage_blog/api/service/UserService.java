@@ -4,6 +4,7 @@ import com.manage_blog.api.model.ListResponse;
 import com.manage_blog.api.model.UserCreateRequest;
 import com.manage_blog.api.model.UserResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;

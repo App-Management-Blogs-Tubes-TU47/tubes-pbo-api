@@ -9,6 +9,7 @@ import com.manage_blog.api.repository.UserRepository;
 import com.manage_blog.api.service.StorageService;
 import com.manage_blog.api.service.UserService;
 import com.manage_blog.api.utils.NullAwareBeanUtils;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,30 +45,18 @@ public class UserServiceImpl implements UserService {
     //    ==========================
     @Override
     @Transactional
-    public ListResponse<List<UserResponse>> getUser(
-            int page,
-            int size,
-            String search
-    ) {
+    public ListResponse<List<UserResponse>> getUser(int page, int size, String search) {
         PageRequest pageRequest = PageRequest.of(page - 1, size);
         Page<Users> userPage = userRepository.findBySearch(search, pageRequest);
-
-        List<UserResponse> userResponses = userPage.getContent().stream()
-                .map(u -> {
+        List<UserResponse> userResponses = userPage.getContent().stream().map(u -> {
                     UserResponse response = new UserResponse(u);
-                    if (u.getProfile() != null) response.setProfileUrl(storageService.getFileUrl(u.getProfile()));
+                    if (u.getProfile() != null)
+                        response.setProfileUrl(storageService.getFileUrl(u.getProfile()));
                     return response;
-                })
-                .toList();
-
-        // Prepare pagination response
+                }).toList();
         PaginationResponse paginationResponse = PaginationResponse.builder()
-                .page(page)
-                .size(size)
-                .totalRecords((int) userPage.getTotalElements())
-                .totalPages(userPage.getTotalPages())
-                .build();
-
+                .page(page).size(size).totalRecords((int) userPage.getTotalElements())
+                .totalPages(userPage.getTotalPages()).build();
         return new ListResponse<>(userResponses, paginationResponse);
     }
 
@@ -77,14 +66,16 @@ public class UserServiceImpl implements UserService {
     //    ==========================
     @Override
     @Transactional(readOnly = true)
-    public UserResponse getUserByUsername(
-            String username
-    ) {
+    public UserResponse getUserByUsername(String username) {
         Users user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND, "User not found"
+                        )
+                );
         UserResponse response = new UserResponse(user);
-        if (user.getProfile() != null) response.setProfileUrl(storageService.getFileUrl(user.getProfile()));
-
+        if (user.getProfile() != null)
+            response.setProfileUrl(storageService.getFileUrl(user.getProfile()));
         return response;
     }
 
@@ -95,37 +86,28 @@ public class UserServiceImpl implements UserService {
     //    ==========================
     @Override
     @Transactional
-    public UserResponse createUser(
-            UserCreateRequest u
-    ) throws IOException {
+    public UserResponse createUser(UserCreateRequest u) throws IOException  {
+        if (userRepository.validateUnameEmailAlreadyExist(u.getEmail(), u.getUsername()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username Or Email already exists");
+        }
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
         LocalDate currentDate = LocalDate.now();
         String formattedDate = currentDate.format(formatter);
-
         String generatedPath = null;
-
         if(u.getProfile() != null) {
             generatedPath = "profile/" + formattedDate + "/" + u.getUsername() + u.getProfile().getContentType();
             storageService.uploadFile(generatedPath, u.getProfile().getInputStream(), u.getProfile().getContentType());
         }
-
-        Users user = Users.builder()
-                .name(u.getName())
-                .username(u.getUsername())
-                .email(u.getEmail())
-                .profile(generatedPath)
-                .role(u.getRole())
+        Users user = Users.builder().name(u.getName()).username(u.getUsername())
+                .email(u.getEmail()).profile(generatedPath).role(u.getRole())
                 .build();
-
-        // Encrypt the password using bcrypt
         String encryptedPassword = passwordEncoder.encode(u.getPassword());
         user.setPassword(encryptedPassword);
-
         userRepository.save(user);
-
         UserResponse response = new UserResponse(user);
-        if(user.getProfile() != null) response.setProfileUrl(storageService.getFileUrl(user.getProfile()));
-
+        if(user.getProfile() != null)
+            response.setProfileUrl(storageService.getFileUrl(user.getProfile()));
         return response;
     }
 
@@ -136,37 +118,24 @@ public class UserServiceImpl implements UserService {
     //    ==========================
     @Override
     @Transactional
-    public UserResponse updateUser(
-            String username,
-            UserCreateRequest u
-    ) throws IOException {
+    public UserResponse updateUser(String username, UserCreateRequest u) throws IOException {
         Users user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found"));
-
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
         LocalDate currentDate = LocalDate.now();
         String formattedDate = currentDate.format(formatter);
-
         String generatedPath = null;
-
-        // Update user details
         NullAwareBeanUtils.copyNonNullProperties(u, user);
-
         if(u.getProfile() != null) {
             generatedPath = "profile/" + formattedDate + "/" + u.getUsername() + u.getProfile().getContentType();
             storageService.uploadFile(generatedPath, u.getProfile().getInputStream(), u.getProfile().getContentType());
             user.setProfile(generatedPath);
         }
-
-        // Encrypt the password using bcrypt
         if(u.getPassword() != null){
             String encryptedPassword = passwordEncoder.encode(u.getPassword());
             user.setPassword(encryptedPassword);
         }
-
         userRepository.save(user);
-
         return new UserResponse(user);
     }
 
@@ -176,14 +145,13 @@ public class UserServiceImpl implements UserService {
     //    ==========================
     @Override
     @Transactional
-    public void deleteUser(
-            String username
-    ) {
+    public void deleteUser(String username) {
         Users user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "User not found")
+                );
         user.setDeletedAt(LocalDateTime.now());
         userRepository.save(user);
-
     }
 
 

@@ -43,9 +43,6 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional
     public DashboardResponse getDashboardData(String token) {
-
-        logger.info("Testing Dashboard Service");
-
         String username = jwtUtils.getUsernameFromToken(token);
 
         Users users = userRepository.findByUsername(username)
@@ -61,18 +58,11 @@ public class DashboardServiceImpl implements DashboardService {
                     return response;
                 })
                 .toList();
-
-
-
-//        List<UserResponse> userResponses = userRepository.findLatestUsersByCreatedAtDesc().stream()
-//                .map(UserResponse::new)
-//                .toList();
         List<BlogResponse> blogResponses = blogRepository.listBlogLatestByCreatedAtDesc(targetUsername).stream()
                 .map(BlogResponse::new)
                 .toList();
 
 
-//        chart for blogs
         List<DashboardBlogCountResponse> blogCountResponse = blogRepository.listBlogCountByMonthInCurrentYear(targetUsername);
         Map<Integer, Long> countMap = blogCountResponse.stream()
                 .collect(Collectors.toMap(DashboardBlogCountResponse::getTitle, DashboardBlogCountResponse::getCount));
@@ -84,7 +74,6 @@ public class DashboardServiceImpl implements DashboardService {
 
         return DashboardResponse.builder()
                 .leaderboard(userResponse)
-//                .users(userResponses)
                 .countBlogs(completeList)
                 .blogs(blogResponses)
                 .build();

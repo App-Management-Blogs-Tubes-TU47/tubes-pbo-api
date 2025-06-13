@@ -27,7 +27,6 @@ public class CommentController {
     public WebResponse<ListResponse<List<CommentResponse>>> getAllComments(
             @PathVariable("blogSlug") String blogSlug
     ) {
-        try {
             ListResponse<List<CommentResponse>> listResponse = commentService.getCommentList(
                     blogSlug
             );
@@ -36,31 +35,18 @@ public class CommentController {
                     .message("Success")
                     .data(listResponse)
                     .build();
-        } catch (Exception e) {
-            return WebResponse.<ListResponse<List<CommentResponse>>>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
     }
 
     @PostMapping
     public WebResponse<CommentResponse> createComment(
             @RequestBody CommentRequest commentRequest
     ) {
-        try {
             CommentResponse response = commentService.createComment(commentRequest);
             return WebResponse.<CommentResponse>builder()
                     .status(200)
                     .message("Success")
                     .data(response)
                     .build();
-        } catch (Exception e) {
-            return WebResponse.<CommentResponse>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
     }
 
     @PatchMapping("/{id}")
@@ -68,37 +54,23 @@ public class CommentController {
             @PathVariable("id") String id,
             @RequestBody CommentRequest commentRequest
     ) {
-        try {
             CommentResponse response = commentService.updateComment(id, commentRequest);
             return WebResponse.<CommentResponse>builder()
                     .status(200)
                     .message("Success")
                     .data(response)
                     .build();
-        } catch (Exception e) {
-            return WebResponse.<CommentResponse>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
     }
 
     @DeleteMapping("/{id}")
     public WebResponse<String> deleteComment(
             @PathVariable("id") String id
     ) {
-        try {
             commentService.deleteComment(id);
             return WebResponse.<String>builder()
                     .status(200)
                     .message("Success")
                     .data("Comment with id " + id + " has been deleted")
                     .build();
-        } catch (Exception e) {
-            return WebResponse.<String>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
     }
 }

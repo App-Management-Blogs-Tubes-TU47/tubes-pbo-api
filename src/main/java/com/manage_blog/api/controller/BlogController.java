@@ -34,7 +34,6 @@ public class BlogController {
             @RequestParam (value = "author", required = false) String author,
             @RequestParam(value = "status", required = false) StatusEnum status
     ) {
-        try {
             if (page < 1){
                 page = 1;
             }
@@ -54,12 +53,6 @@ public class BlogController {
                     .message("Success")
                     .data(listResponse)
                     .build();
-        } catch (Exception e) {
-            return WebResponse.<ListResponse<List<BlogResponse>>>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
     }
 
 //    =========================
@@ -70,19 +63,12 @@ public class BlogController {
     public WebResponse<BlogResponse> getBlogBySlugs(
             @PathVariable("slugs") String slugs
     ) {
-        try {
             BlogResponse blogResponse = blogService.getBlogBySlugs(slugs);
             return WebResponse.<BlogResponse>builder()
                     .status(200)
                     .message("Success")
                     .data(blogResponse)
                     .build();
-        } catch (Exception e) {
-            return WebResponse.<BlogResponse>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
     }
 
 //    =========================
@@ -129,19 +115,12 @@ public class BlogController {
      public WebResponse<String> deleteBlog(
              @PathVariable("slugs") String slugs
      ) {
-        try {
             blogService.deleteBlog(slugs);
             return WebResponse.<String>builder()
                     .status(200)
                     .message("Success")
                     .data("Blog deleted successfully")
                     .build();
-        } catch (Exception e) {
-            return WebResponse.<String>builder()
-                    .status(500)
-                    .error(e.getMessage())
-                    .build();
-        }
      }
 
 
