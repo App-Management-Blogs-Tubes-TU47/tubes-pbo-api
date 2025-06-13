@@ -81,6 +81,11 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
                 ));
 
         NullAwareBeanUtils.copyNonNullProperties(blogCategory, blogCategory);
+
+        if (blogCategoryRepository.findExistingByName(blogCategoryRequest.getName())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Blog category already exists");
+        }
+
         blogCategory.setName(blogCategoryRequest.getName());
         blogCategory.setSlugs(
                 createSlugService.createSlug(blogCategoryRequest.getName())

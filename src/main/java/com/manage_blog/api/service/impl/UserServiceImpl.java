@@ -126,6 +126,12 @@ public class UserServiceImpl implements UserService {
         String formattedDate = currentDate.format(formatter);
         String generatedPath = null;
         NullAwareBeanUtils.copyNonNullProperties(u, user);
+
+        if (username != u.getUsername() && user.getEmail() != u.getEmail()) {
+            if (userRepository.validateUnameEmailAlreadyExist(u.getEmail(), u.getUsername()).isPresent())
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Username Or Email already exists");
+        }
+
         if(u.getProfile() != null) {
             generatedPath = "profile/" + formattedDate + "/" + u.getUsername() + u.getProfile().getContentType();
             storageService.uploadFile(generatedPath, u.getProfile().getInputStream(), u.getProfile().getContentType());
@@ -136,7 +142,12 @@ public class UserServiceImpl implements UserService {
             user.setPassword(encryptedPassword);
         }
         userRepository.save(user);
-        return new UserResponse(user);
+
+        UserResponse response = new UserResponse(user);
+        if (user.getProfile() != null)
+            response.setProfileUrl(storageService.getFileUrl(user.getProfile()));
+
+        return response;
     }
 
     //    ==========================
