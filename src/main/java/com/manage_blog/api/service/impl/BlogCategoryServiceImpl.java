@@ -58,9 +58,9 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
     @Transactional
     public BlogCategoryResponse createCategory(BlogCategoryRequest blogCategoryRequest) {
 
-        if (blogCategoryRepository.findExistingByName(blogCategoryRequest.getName())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Blog category already exists");
-        }
+//        if (blogCategoryRepository.findExistingByName(blogCategoryRequest.getName())) {
+//            throw new ResponseStatusException(HttpStatus.CONFLICT, "Blog category already exists");
+//        }
 
         BlogCategory blogCategory = new BlogCategory();
         blogCategory.setName(blogCategoryRequest.getName());
@@ -82,9 +82,9 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
 
         NullAwareBeanUtils.copyNonNullProperties(blogCategory, blogCategory);
 
-        if (blogCategoryRepository.findExistingByName(blogCategoryRequest.getName())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Blog category already exists");
-        }
+//        if (blogCategoryRepository.findExistingByName(blogCategoryRequest.getName())) {
+//            throw new ResponseStatusException(HttpStatus.CONFLICT, "Blog category already exists");
+//        }
 
         blogCategory.setName(blogCategoryRequest.getName());
         blogCategory.setSlugs(
